@@ -113,13 +113,6 @@ int main(int argc, char const *argv[])
 		for (int line = scroll; line < lineLengths.used && line < scroll+HEIGHT - 1; line++) {
 			int lineLen = lineLengths.array[line];
 			printw("%3d ", line+1);
-			if (line == cursorLine) {
-				addch('+');
-			}
-			else {
-				addch('|');
-			}
-			addch(' ');
 			// j = col line = line i = position in whole data
 			for (int j = 0; j <= lineLen; j++) {
 				
@@ -139,7 +132,7 @@ int main(int argc, char const *argv[])
 		}
 		if (lineLengths.used - scroll < HEIGHT) {
 			for (int i = 0; i < HEIGHT ; i++) {
-				printw("\n%5c", '~');
+				printw("\n%3c", '~');
 			}
 		}
 		printw("%s\t%d,%d", argv[1] ,cursorCol, cursorLine);
@@ -243,6 +236,35 @@ int main(int argc, char const *argv[])
 				writeToFile(argv[1], data.array, data.used);
 				break;
 			}
+			case '\'':
+			case '"':
+			case '[':
+			case '{':
+            case '(': {
+            	char closing;
+            	switch (input) {
+            		case '(':
+            		closing = ')';
+            		break;
+            		case '[':
+            		closing = ']';
+            		break;
+            		case '{':
+            		closing = '}';
+            		break;
+            		case '\'':
+            		closing = '\'';
+            		break;
+            		case '"':
+            		closing = '"';
+            		break;
+            	}
+                insertArray(&data, input, cursorPos);
+                insertArray(&data, closing, cursorPos+1);
+                lineLengths.array[cursorLine]+=2;
+                cursorCol++;
+                break;
+            }
 			default: {
 				insertArray(&data, input, cursorPos);
 				lineLengths.array[cursorLine]++;
